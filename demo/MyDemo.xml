@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MyDemo</name>
+    </assembly>
+    <members>
+        <member name="M:MvcMovie.Controllers.HelloWorldController.Welcome3(System.String,System.Int32)">
+            <summary>
+            @ViewData["Message"]
+            </summary>
+            <param name="name"></param>
+            <param name="numTimes"></param>
+            <returns></returns>
+        </member>
+        <member name="P:demo.Data.DBEntity.CommonDBEntity.Sort">
+            <summary>
+            排序
+            </summary>
+        </member>
+        <member name="M:MyDemo.Controllers.MoviesController.Index(System.String,System.String)">
+            <summary>
+            按“类型”或“名称”搜索电影
+            </summary>
+            <param name="searchString"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MyDemo.Controllers.MoviesController.Index(System.String,System.Boolean)">
+            <summary>
+            notUsed 参数用于创建 Index 方法的重载
+            </summary>
+            <param name="searchString"></param>
+            <param name="notUsed"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MyDemo.Controllers.MoviesController.Index2(System.String)">
+            <summary>
+             按id搜索电影
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MyDemo.Controllers.MoviesController.DeleteConfirmed(System.Int32)">
+            <summary>
+            POST: Movies/Delete/5
+            ActionName对路由系统执行映射，以便包括 POST 请求的 /Delete/ 的 URL可找到 DeleteConfirmed 
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MyDemo.Controllers.TodoItemsController.GetTodoItems">
+            <summary>
+            GET: api/TodoItems
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:MyDemo.Controllers.TodoItemsController.GetTodoItem(System.Int64)">
+            <summary>
+            GET: api/TodoItems/5
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="P:MyDemo.Data.DBEntity.Movie.ReleaseDate">
+            <summary>
+             Display特性指定要显示的字段名称的内容
+             DataType属性指定数据的类型（日期）
+             DisplayFormat特性用于显式指定日期格式
+             ApplyFormatInEditMode设置指定在文本框中显示值以进行编辑时也应用格式
+            </summary>
+        </member>
+        <member name="T:MyDemo.Models.MovieGenreViewModel">
+            <summary>
+            “电影流派”视图模型
+            </summary>
+        </member>
+        <member name="P:MyDemo.Models.MovieGenreViewModel.Genres">
+            <summary>
+            包含流派列表的 SelectList用户能够从列表中选择一种流派
+            </summary>
+        </member>
+    </members>
+</doc>
