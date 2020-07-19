@@ -12,6 +12,8 @@ using Newtonsoft.Json.Serialization;
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using StackExchange.Redis;
@@ -56,16 +58,16 @@ namespace demo
 
             //api以下是较新的写法，AddXmlDataContractSerializerFormatters() 等方法使用更方便。
             services.AddControllers(setup =>
-            {
-                //启用406状态码
-                setup.ReturnHttpNotAcceptable = true;
-            })
-                 //默认格式取决于序列化工具的添加顺序 P32
-                 .AddNewtonsoftJson(options =>  //第三方 JSON 序列化和反序列化工具（会替换掉原本默认的 JSON 序列化工具）（P32）
+                {
+                    //启用406状态码
+                    setup.ReturnHttpNotAcceptable = true;
+                })
+                //默认格式取决于序列化工具的添加顺序 P32
+                .AddNewtonsoftJson(options => //第三方 JSON 序列化和反序列化工具（会替换掉原本默认的 JSON 序列化工具）（P32）
                 {
                     options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                 })
-                 .AddXmlDataContractSerializerFormatters();//XML序列化和反序列化工具 支持更多类型，如datetime offset（P8,P25)
+                .AddXmlDataContractSerializerFormatters(); //XML序列化和反序列化工具 支持更多类型，如datetime offset（P8,P25)
             //.ConfigureApiBehaviorOptions(options =>   //自定义错误报告（P29）
             //{
             //    //创建一个委托 context，在 IsValid == false 时执行
@@ -99,7 +101,8 @@ namespace demo
                     //将NewtonsoftJsonOutputFormatter 设为 "application/vnd.company.hateoas+json" 等 Media type 的输出格式化器
                     newtonSoftJsonOutputFormatter.SupportedMediaTypes.Add("application/vnd.company.hateoas+json");
                     newtonSoftJsonOutputFormatter.SupportedMediaTypes.Add("application/vnd.company.friendly+json");
-                    newtonSoftJsonOutputFormatter.SupportedMediaTypes.Add("application/vnd.company.friendly.hateoas+json");
+                    newtonSoftJsonOutputFormatter.SupportedMediaTypes.Add(
+                        "application/vnd.company.friendly.hateoas+json");
                     newtonSoftJsonOutputFormatter.SupportedMediaTypes.Add("application/vnd.company.full+json");
                     newtonSoftJsonOutputFormatter.SupportedMediaTypes.Add("application/vnd.company.full.hateoas+json");
                 }
@@ -110,13 +113,16 @@ namespace demo
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             //AddScoped：每次请求都获取一个新的实例。同一个请求获取多次会得到相同的实例
             services.AddScoped<ICompanyRepository, CompanyRepository>();
+            services.AddScoped<IMyScopedSerivce, MyScopedSerivce>();
             //AddTransient瞬时模式：每次请求都获取一个新的实例。即使同一个请求获取多次也会是不同的实例   
             //轻量服务可以使用 Transient 注册排序使用的属性映射服务（P37）
             services.AddTransient<IPropertyMappingService, PropertyMappingService>();
+            services.AddTransient<IMyTransientService, MyTransientService>();
             //判断 Uri query 字符串中的 fields 是否合法（P39）
             services.AddTransient<IPropertyCheckerService, PropertyCheckerService>();
             //AddSingleton单例模式：每次都获取同一个实例
             //services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect("10.211.55.2:6379"));
+            services.AddSingleton<IMySingletonService, MySingletonService>();
 
             var connection = Configuration.GetConnectionString("MySqlConnection");
             services.AddDbContext<DBContext>(options => options.UseMySql(connection));
@@ -143,8 +149,10 @@ namespace demo
                 });
 
                 // 为 Swagger JSON and UI设置xml文档注释路径
-                var basePath = Path.GetDirectoryName(typeof(Program).Assembly.Location);//获取应用程序所在目录（绝对，不受工作目录影响，建议采用此方法获取路径）
-                var xmlPath = Path.Combine(basePath, "SwaggerDemo.xml");
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var basePath =
+                    Path.GetDirectoryName(typeof(Program).Assembly.Location); //获取应用程序所在目录（绝对，不受工作目录影响，建议采用此方法获取路径）
+                var xmlPath = Path.Combine(basePath, xmlFile);
                 c.IncludeXmlComments(xmlPath);
             });
         }
@@ -156,6 +164,17 @@ namespace demo
         /// <param name="env"></param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            #region Nlog记日志
+
+            //将日志记录到数据库                 config/NLog.config
+            NLog.LogManager.LoadConfiguration("nlog.config").GetCurrentClassLogger();
+            //NLog.LogManager.Configuration.Variables["connectionString"] =
+            //    Configuration.GetConnectionString("DefaultConnection");
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); //避免日志中的中文输出乱码
+
+            #endregion
+
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -175,6 +194,7 @@ namespace demo
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 

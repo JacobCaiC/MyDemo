@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using demo.Models;
+using MyDemo.Services;
 using StackExchange.Redis;
 
 namespace demo.Controllers
@@ -16,7 +17,7 @@ namespace demo.Controllers
         private readonly IConnectionMultiplexer _redis;
         private readonly IDatabase _db;
 
-        public HomeController(ILogger<HomeController> logger,IConnectionMultiplexer redis)
+        public HomeController(ILogger<HomeController> logger, IConnectionMultiplexer redis)
         {
             _logger = logger;
             _redis = redis;
@@ -26,10 +27,10 @@ namespace demo.Controllers
 
         public IActionResult Index()
         {
-            _db.StringSet("fullName","JacobCai");
+            _db.StringSet("fullName", "JacobCai");
             var name = _db.StringGet("fullName");
 
-            return View("Index",name);
+            return View("Index", name);
         }
 
         public IActionResult Privacy()
@@ -40,7 +41,21 @@ namespace demo.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
+        }
+
+        [HttpGet]
+        public int GetServices([FromServices] IMySingletonService singleton1,
+            [FromServices] IMySingletonService singleton2,
+            [FromServices] IMyScopedSerivce scoped1,
+            [FromServices] IMyScopedSerivce scoped2,
+            [FromServices] IMyTransientService transient1,
+            [FromServices] IMyTransientService transient2)
+        {
+
+
+            return 1;
+
         }
     }
 }

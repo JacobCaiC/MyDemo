@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MyDemo.Models;
 using System;
+using NLog.Web;
 
 namespace demo
 {
@@ -28,7 +29,7 @@ namespace demo
                     //每次运行都把数据库删了重建（P1）
                     var context = services.GetRequiredService<DBContext>();
                     context.Database.EnsureDeleted();
-                    context.Database.Migrate();//迁移
+                    context.Database.Migrate(); //迁移
                     SeedData.Initialize(services);
                 }
                 catch (Exception ex)
@@ -45,7 +46,17 @@ namespace demo
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    webBuilder.UseStartup<Startup>()
+                        //这里是配置log的
+                        .ConfigureLogging((hostingContext, builder) =>
+                        {
+                            builder.ClearProviders();
+                            builder.SetMinimumLevel(LogLevel.Trace); //使用Nlogs的配置
+                            //builder.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
+                            //builder.AddConsole();
+                            //builder.AddDebug();
+                        })
+                        .UseNLog(); // NLog: setup NLog for Dependency injection. 3.0中这样添加;
                 });
     }
 }

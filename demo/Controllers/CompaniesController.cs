@@ -44,6 +44,9 @@ namespace MyDemo.Controllers
             _propertyCheckerService = propertyCheckerService ?? throw new ArgumentNullException(nameof(propertyCheckerService));
         }
 
+        #region Controllers
+
+        #region HttpGet
         /// <summary>
         /// 查询所有企业;Head 请求只会返回 Header 信息，没有 Body
         /// </summary>
@@ -134,10 +137,18 @@ namespace MyDemo.Controllers
         /// </summary>
         /// <param name="companyId"></param>
         /// <returns></returns>
+        //本项目在 Startup.cs 中对输出格式化器进行全局设置，不再使用 Produces 属性进行局部设置
+        //[Produces("application/json",//当遇到以下 Accept 值时，实际返回 application/json（视频P43）
+        //                             //将忽视 Startup.cs 中对输出格式化器的全局设置，导致当前方法不支持 xml
+        //                             "application/vnd.company.hateoas+json",
+        //                             "application/vnd.company.friendly+json",
+        //                             "application/vnd.company.friendly.hateoas+json",
+        //                             "application/vnd.company.full+json",
+        //                             "application/vnd.company.full.hateoas+json")]
         [HttpGet("{companyId}", Name = nameof(GetCompany))]
         public async Task<IActionResult> GetCompany(Guid companyId,
             string fields,
-            [FromHeader(Name="Accept")] string acceptMediaType) //从header把accept取出来赋给acceptMediaType
+            [FromHeader(Name="Accept")] string acceptMediaType) //从请求header把accept取出来赋给acceptMediaType
         {
             //var exist = await _companyRepository.CompanyExistsAsync(companyId);
 
@@ -148,6 +159,7 @@ namespace MyDemo.Controllers
             }
 
             //尝试解析 MediaTypeHeaderValue（P43）
+            //关于 MediaTypeHeaderValue https://docs.microsoft.com/zh-cn/dotnet/api/system.net.http.headers.mediatypeheadervalue
             if (!MediaTypeHeaderValue.TryParse(acceptMediaType, out MediaTypeHeaderValue parsedAcceptMediaType))
             {
                 //解析不成功
@@ -160,6 +172,7 @@ namespace MyDemo.Controllers
                 return NotFound();
             }
 
+
             var links = CreateLinksForCompany(companyId, fields);
 
             var linkedDict = _mapper.Map<CompanyDto>(company).ShapeData(fields)
@@ -168,6 +181,10 @@ namespace MyDemo.Controllers
 
             return Ok(linkedDict);
         }
+
+        #endregion HttpGet
+
+        #region HttpPost
 
         /// <summary>
         /// CompanyAddDto创建公司 
@@ -204,6 +221,8 @@ namespace MyDemo.Controllers
                 linkedDict);
         }
 
+        #endregion HttpPost
+
         /// <summary>
         /// HttpOptions 获取针对某个webapi的通信选项的信息
         /// </summary>
@@ -236,7 +255,9 @@ namespace MyDemo.Controllers
             await _companyRepository.SaveAsync();
             return NoContent();
         }
+        #endregion Controllers
 
+        #region Functions
         /// <summary>
         /// 生成上一页或下一页的 URI（P35）
         /// </summary>
@@ -361,6 +382,8 @@ namespace MyDemo.Controllers
             }
             return links;
         }
+
+        #endregion Functions
 
 
     }

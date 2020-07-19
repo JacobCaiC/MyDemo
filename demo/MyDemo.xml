@@ -4,47 +4,144 @@
         <name>MyDemo</name>
     </assembly>
     <members>
-        <member name="M:MvcMovie.Controllers.HelloWorldController.Welcome3(System.String,System.Int32)">
+        <member name="T:MyDemo.Controllers.CompaniesController">
             <summary>
-            @ViewData["Message"]
+            Controller继承ControllerBase，增加视图支持
+            [ApiController] 属性并不是强制要求的，但是它会使开发体验更好
+            它会启用以下行为：
+            1.要求使用属性路由（Attribute Routing）2.自动HTTP 400响应 
+            3.推断参数的绑定源 4.Multipart/form-data请求推断 5.错误状态代码的问题详细信息
             </summary>
-            <param name="name"></param>
-            <param name="numTimes"></param>
+        </member>
+        <member name="M:MyDemo.Controllers.CompaniesController.GetCompanies(MyDemo.Models.DtoParamaters.CompanyDtoParameters)">
+            <summary>
+            查询所有企业;Head 请求只会返回 Header 信息，没有 Body
+            </summary>
             <returns></returns>
         </member>
-        <member name="P:demo.Data.DBEntity.CommonDBEntity.Sort">
+        <member name="M:MyDemo.Controllers.CompaniesController.GetCompany(System.Guid,System.String,System.String)">
             <summary>
-            排序
+            由id获取企业
             </summary>
-        </member>
-        <member name="M:MyDemo.Controllers.MoviesController.Index(System.String,System.String)">
-            <summary>
-            按“类型”或“名称”搜索电影
-            </summary>
-            <param name="searchString"></param>
+            <param name="companyId"></param>
             <returns></returns>
         </member>
-        <member name="M:MyDemo.Controllers.MoviesController.Index(System.String,System.Boolean)">
+        <member name="M:MyDemo.Controllers.CompaniesController.CreateCompany(MyDemo.Models.Dto.CompanyAddDto)">
             <summary>
-            notUsed 参数用于创建 Index 方法的重载
+            CompanyAddDto创建公司 
             </summary>
-            <param name="searchString"></param>
-            <param name="notUsed"></param>
+            <param name="company"></param>
             <returns></returns>
         </member>
-        <member name="M:MyDemo.Controllers.MoviesController.Index2(System.String)">
+        <member name="M:MyDemo.Controllers.CompaniesController.GetCompaniesOptions">
             <summary>
-             按id搜索电影
+            HttpOptions 获取针对某个webapi的通信选项的信息
             </summary>
-            <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:MyDemo.Controllers.MoviesController.DeleteConfirmed(System.Int32)">
+        <member name="M:MyDemo.Controllers.CompaniesController.DeleteCompany(System.Guid)">
             <summary>
-            POST: Movies/Delete/5
-            ActionName对路由系统执行映射，以便包括 POST 请求的 /Delete/ 的 URL可找到 DeleteConfirmed 
+            删除公司
             </summary>
-            <param name="id"></param>
+            <param name="companyId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MyDemo.Controllers.CompaniesController.CreateCompaniesResourceUri(MyDemo.Models.DtoParamaters.CompanyDtoParameters,MyDemo.Helpers.ResourceUriType)">
+            <summary>
+            生成上一页或下一页的 URI（P35）
+            </summary>
+            <param name="parameters"></param>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MyDemo.Controllers.CompaniesController.CreateLinksForCompany(System.Guid,System.String)">
+            <summary>
+            为Company单个资源创建 HATEOAS 的 links（P41）
+            </summary>
+            <param name="companyId">Company Id</param>
+            <param name="fields">fields 字符串</param>
+            <returns>Company 单个资源的 links</returns>
+        </member>
+        <member name="M:MyDemo.Controllers.CompaniesController.CreateLinksForCompany(MyDemo.Models.DtoParamaters.CompanyDtoParameters,System.Boolean,System.Boolean)">
+            <summary>
+            为 Companies 集合资源创建 HATEOAS 的 links（P42）
+            </summary>
+            <param name="parameters">CompanyDtoParameters</param>
+            <param name="hasPrevious">是否有上一页</param>
+            <param name="hasNext">是否有下一页</param>
+            <returns>GetCompanies 集合资源的 links</returns>
+        </member>
+        <member name="M:MyDemo.Controllers.CompanyCollectionsController.GetCompanyCollection(System.Collections.Generic.IEnumerable{System.Guid})">
+            <summary>
+            传递多个key:1,2,3,4
+            key1=value1,key2=value2
+            </summary>
+            <param name="ids"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MyDemo.Controllers.CompanyCollectionsController.CreateCompanyCollection(System.Collections.Generic.IEnumerable{MyDemo.Models.Dto.CompanyAddDto})">
+            <summary>
+            
+            </summary>
+            <param name="companyCollection"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MyDemo.Controllers.EmployeesController.GetEmployeesForCompany(System.Guid,MyDemo.Models.DtoParamaters.EmployeeDtoParameters)">
+            <summary>
+            通过公司id获取所有员工
+            </summary>
+            <param name="companyId"></param>
+            <returns></returns>
+            FromQuery(Name = "gender")指定参数名
+        </member>
+        <member name="M:MyDemo.Controllers.EmployeesController.GetEmployeeForCompany(System.Guid,System.Guid)">
+            <summary>
+            通过公司id和员工id获取
+            </summary>
+            <param name="companyId"></param>
+            <param name="employeeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MyDemo.Controllers.EmployeesController.CreateEmployeeForCompany(System.Guid,MyDemo.Models.Dto.EmployeeAddDto)">
+            <summary>
+            公司创建职员
+            </summary>
+            <param name="companyId"></param>
+            <param name="employee"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MyDemo.Controllers.EmployeesController.UpdateEmployeeForCompany(System.Guid,System.Guid,MyDemo.Models.Dto.EmployeeUpdateDto)">
+            <summary>
+            整体更新/替换，PUT不是安全的，但是幂等
+            </summary>
+            <param name="companyId"></param>
+            <param name="employeeId"></param>
+            <param name="employeeUpdateDto"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MyDemo.Controllers.EmployeesController.PartiallyUpdateEmployeeForCompany(System.Guid,System.Guid,Microsoft.AspNetCore.JsonPatch.JsonPatchDocument{MyDemo.Models.Dto.EmployeeUpdateDto})">
+            <summary>
+            HTTP PATCH 举例（P32）
+            </summary>
+            <param name="companyId"></param>
+            <param name="employeeId"></param>
+            <param name="patchDocument"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MyDemo.Controllers.EmployeesController.DeleteEmployeeForCompany(System.Guid,System.Guid)">
+            <summary>
+            删除公司员工
+            </summary>
+            <param name="companyId"></param>
+            <param name="employeeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MyDemo.Controllers.EmployeesController.ValidationProblem(Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary)">
+            <summary>
+            重写 ValidationProblem
+            使 PartiallyUpdateEmployeeForCompany 中的 ValidationProblem() 返回状态码422而不是400
+            </summary>
+            <param name="modelStateDictionary"></param>
             <returns></returns>
         </member>
         <member name="M:MyDemo.Controllers.TodoItemsController.GetTodoItems">
@@ -60,12 +157,104 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="P:MyDemo.Data.DBEntity.Movie.ReleaseDate">
+        <member name="P:MyDemo.Entities.Movie.ReleaseDate">
             <summary>
              Display特性指定要显示的字段名称的内容
              DataType属性指定数据的类型（日期）
              DisplayFormat特性用于显式指定日期格式
              ApplyFormatInEditMode设置指定在文本框中显示值以进行编辑时也应用格式
+            </summary>
+        </member>
+        <member name="T:MyDemo.Helpers.ArrayModelBinder">
+            <summary>
+            自定义 Model 绑定器（P24)
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "T:MyDemo.Helpers.IEnumerableExtensions" -->
+        <!-- Badly formed XML comment ignored for member "T:MyDemo.Helpers.IQueryableExtensions" -->
+        <member name="T:MyDemo.Helpers.ObjectExtensions">
+            <summary>
+            Object 的拓展方法
+            用于查询单个数据时的数据塑形（P39）
+            </summary>
+        </member>
+        <member name="T:MyDemo.Helpers.PagedList`1">
+            <summary>
+            翻页类，进行分页操作并保存分页信息（P35)
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="P:MyDemo.Helpers.PagedList`1.CurrentPage">
+            <summary>
+            当前页码
+            </summary>
+        </member>
+        <member name="P:MyDemo.Helpers.PagedList`1.TotalPages">
+            <summary>
+            总页数
+            </summary>
+        </member>
+        <member name="P:MyDemo.Helpers.PagedList`1.PageSize">
+            <summary>
+            单页条目数
+            </summary>
+        </member>
+        <member name="P:MyDemo.Helpers.PagedList`1.TotalCount">
+            <summary>
+            总条目数
+            </summary>
+        </member>
+        <member name="P:MyDemo.Helpers.PagedList`1.HasPrevious">
+            <summary>
+            是否有上一页
+            </summary>
+        </member>
+        <member name="P:MyDemo.Helpers.PagedList`1.HasNext">
+            <summary>
+            是否有下一页
+            </summary>
+        </member>
+        <member name="M:MyDemo.Helpers.PagedList`1.#ctor(System.Collections.Generic.List{`0},System.Int32,System.Int32,System.Int32)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="items"></param>
+            <param name="count"></param>
+            <param name="pageNumber"></param>
+            <param name="pageSize"></param>
+        </member>
+        <member name="T:MyDemo.Helpers.ResourceUriType">
+            <summary>
+            需要生成的翻页 URI 是上一页还是下一页（P35）
+            </summary>
+        </member>
+        <member name="T:MyDemo.Models.Dto.CompanyAddDto">
+            <summary>
+            输入使用的Dto
+            查询、插入、更新应该使用不同的Dto，便于业务升级与重构
+            </summary>
+        </member>
+        <member name="T:MyDemo.Models.Dto.CompanyFullDto">
+            <summary>
+            输出 Company 使用的 Full Dto，包含 Company 的所有属性/字段（P43）
+            </summary>
+        </member>
+        <member name="M:MyDemo.Models.Dto.EmployeeAddOrUpdateDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            自定义验证规则
+            属性类别的验证优先执行
+            </summary>
+            <param name="validationContext"></param>
+            <returns></returns>
+        </member>
+        <member name="T:MyDemo.Models.Dto.EmployeeDto">
+            <summary>
+            EmployeeDto
+            </summary>
+        </member>
+        <member name="T:MyDemo.Models.Dto.LinkDto">
+            <summary>
+            HATEOAS 的 links Dto（P41）
             </summary>
         </member>
         <member name="T:MyDemo.Models.MovieGenreViewModel">
@@ -77,6 +266,208 @@
             <summary>
             包含流派列表的 SelectList用户能够从列表中选择一种流派
             </summary>
+        </member>
+        <member name="T:MyDemo.Profiles.CompanyProfile">
+            <summary>
+            AutoMapper 针对 Company 的映射关系配置文件（P12）
+            </summary>
+        </member>
+        <member name="M:MyDemo.Profiles.EmployeeProfile.GetAge(System.DateTime)">
+            <summary>
+            获得年龄
+            </summary>
+            <param name="dateOfBirth">出生日期</param>
+            <returns></returns>
+        </member>
+        <member name="M:MyDemo.Services.CompanyRepository.GetCompaniesAsync(MyDemo.Models.DtoParamaters.CompanyDtoParameters)">
+            <summary>
+            条件查询
+            </summary>
+            <param name="parameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MyDemo.Services.CompanyRepository.GetCompanyAsync(System.Guid)">
+            <summary>
+            通过id获取
+            </summary>
+            <param name="companyId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MyDemo.Services.CompanyRepository.GetCompaniesAsync(System.Collections.Generic.IEnumerable{System.Guid})">
+            <summary>
+            通过id集合获取
+            </summary>
+            <param name="companyIds"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MyDemo.Services.CompanyRepository.AddCompany(MyDemo.Entities.Company)">
+            <summary>
+            增
+            </summary>
+            <param name="company"></param>
+        </member>
+        <member name="M:MyDemo.Services.CompanyRepository.UpdateCompany(MyDemo.Entities.Company)">
+            <summary>
+            改
+            </summary>
+            <param name="company"></param>
+        </member>
+        <member name="M:MyDemo.Services.CompanyRepository.DeleteCompany(MyDemo.Entities.Company)">
+            <summary>
+            删除公司
+            </summary>
+            <param name="company"></param>
+        </member>
+        <member name="M:MyDemo.Services.CompanyRepository.CompanyExistsAsync(System.Guid)">
+            <summary>
+            通过id判断存在
+            </summary>
+            <param name="companyId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MyDemo.Services.CompanyRepository.GetEmployeeAsync(System.Guid,System.Guid)">
+            <summary>
+            通过公司id和员工id获取
+            </summary>
+            <param name="companyId"></param>
+            <param name="employeeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MyDemo.Services.CompanyRepository.GetEmployeesAsync(System.Guid,MyDemo.Models.DtoParamaters.EmployeeDtoParameters)">
+            <summary>
+            公司id条件查询
+            </summary>
+            <param name="companyId"></param>
+            <param name="parameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MyDemo.Services.CompanyRepository.AddEmployee(System.Guid,MyDemo.Entities.Employee)">
+            <summary>
+            根据公司添加employee
+            </summary>
+            <param name="companyId"></param>
+            <param name="employee"></param>
+        </member>
+        <member name="M:MyDemo.Services.CompanyRepository.UpdateEmployee(MyDemo.Entities.Employee)">
+            <summary>
+            修改
+            </summary>
+            <param name="employee"></param>
+        </member>
+        <member name="M:MyDemo.Services.CompanyRepository.DeleteEmployee(MyDemo.Entities.Employee)">
+            <summary>
+            删除
+            </summary>
+            <param name="employee"></param>
+        </member>
+        <member name="M:MyDemo.Services.CompanyRepository.SaveAsync">
+            <summary>
+            保存
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:MyDemo.Services.IPropertyCheckerService.TypeHasProperties``1(System.String)">
+            <summary>
+            fields 字符串是否合法（P39）
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="fields"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MyDemo.Services.IPropertyMappingService.GetPropertyMapping``2">
+            <summary>
+            如果TSource 与 TDestination 存在映射关系，返回映射关系字典
+            </summary>
+            <typeparam name="TSource"></typeparam>
+            <typeparam name="TDestination"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:MyDemo.Services.IPropertyMappingService.ValidMappingExistsFor``2(System.String)">
+            <summary>
+            客户端提交的 Uri query string 中的 orderby 是否合法（P38）
+            </summary>
+            <typeparam name="TSource"></typeparam>
+            <typeparam name="TDestination"></typeparam>
+            <param name="fields"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MyDemo.Services.PropertyCheckerService.TypeHasProperties``1(System.String)">
+            <summary>
+            fields 字符串是否合法（P39）
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="fields"></param>
+            <returns></returns>
+        </member>
+        <member name="T:MyDemo.Services.PropertyMappingService">
+            <summary>
+            排序使用的属性映射服务（P37）
+            </summary>
+        </member>
+        <member name="M:MyDemo.Services.PropertyMappingService.GetPropertyMapping``2">
+            <summary>
+            如果TSource 与 TDestination 存在映射关系，返回映射关系字典
+            </summary>
+            <typeparam name="TSource"></typeparam>
+            <typeparam name="TDestination"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:MyDemo.Services.PropertyMappingService.ValidMappingExistsFor``2(System.String)">
+            <summary>
+            客户端提交的 Uri query string 中的 orderby 是否合法（P38）
+            </summary>
+            <typeparam name="TSource"></typeparam>
+            <typeparam name="TDestination"></typeparam>
+            <param name="fields"></param>
+            <returns></returns>
+        </member>
+        <member name="T:MyDemo.Services.PropertyMappingValue">
+            <summary>
+            排序使用的属性映射值（P37）
+            </summary>
+        </member>
+        <member name="M:MyDemo.ViewComponents.CounterViewComponent.InvokeAsync">
+            <summary>
+            计数
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:MvcMovie.Controllers.HelloWorldController.Welcome3(System.String,System.Int32)">
+            <summary>
+            @ViewData["Message"]
+            </summary>
+            <param name="name"></param>
+            <param name="numTimes"></param>
+            <returns></returns>
+        </member>
+        <member name="M:demo.Data.DBContext.OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <summary>
+            实体限制，初始化数据
+            </summary>
+            <param name="modelBuilder"></param>
+        </member>
+        <member name="P:demo.Entities.CommonDBEntity.Sort">
+            <summary>
+            排序
+            </summary>
+        </member>
+        <member name="T:demo.Program">
+            <summary>
+            程序入口
+            </summary>
+        </member>
+        <member name="M:demo.Startup.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            服务容器注册
+            </summary>
+            <param name="services"></param>
+        </member>
+        <member name="M:demo.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IWebHostEnvironment)">
+            <summary>
+            指定asp.netcore web程序如何响应每个http请求，app添加中间件
+            </summary>
+            <param name="app"></param>
+            <param name="env"></param>
         </member>
     </members>
 </doc>
