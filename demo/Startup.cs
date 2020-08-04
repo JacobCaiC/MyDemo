@@ -118,11 +118,15 @@ namespace demo
             //轻量服务可以使用 Transient 注册排序使用的属性映射服务（P37）
             services.AddTransient<IPropertyMappingService, PropertyMappingService>();
             services.AddTransient<IMyTransientService, MyTransientService>();
+            //services.AddTransient<IOrderService, DisposableOrderService>();
             //判断 Uri query 字符串中的 fields 是否合法（P39）
             services.AddTransient<IPropertyCheckerService, PropertyCheckerService>();
             //AddSingleton单例模式：每次都获取同一个实例
             //services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect("10.211.55.2:6379"));
             services.AddSingleton<IMySingletonService, MySingletonService>();
+            services.AddSingleton<OrderServiceOptions>();
+            services.AddSingleton<IOrderService, OrderService>();
+
 
             var connection = Configuration.GetConnectionString("MySqlConnection");
             services.AddDbContext<DBContext>(options => options.UseMySql(connection));

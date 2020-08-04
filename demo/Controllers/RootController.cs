@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MyDemo.Models.Dto;
+using MyDemo.Services;
 
 namespace MyDemo.Controllers
 {
@@ -31,5 +32,12 @@ namespace MyDemo.Controllers
             };
             return Ok(resource);
         }
+
+        // [HttpGet]
+        // public int Get([FromServices]OrderService orderService)
+        // {
+        //     Console.WriteLine($"orderService.ShowMaxOrderCount:{orderService.ShowMaxOrderCount()}");
+        //     return 1;
+        // }
     }
 }

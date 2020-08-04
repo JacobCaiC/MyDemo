@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using demo.Models;
+using Microsoft.Extensions.DependencyInjection;
 using MyDemo.Services;
 using StackExchange.Redis;
 
@@ -16,6 +17,7 @@ namespace demo.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly IConnectionMultiplexer _redis;
         private readonly IDatabase _db;
+
 
         public HomeController(ILogger<HomeController> logger, IConnectionMultiplexer redis)
         {
@@ -44,18 +46,5 @@ namespace demo.Controllers
             return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
         }
 
-        [HttpGet]
-        public int GetServices([FromServices] IMySingletonService singleton1,
-            [FromServices] IMySingletonService singleton2,
-            [FromServices] IMyScopedSerivce scoped1,
-            [FromServices] IMyScopedSerivce scoped2,
-            [FromServices] IMyTransientService transient1,
-            [FromServices] IMyTransientService transient2)
-        {
-
-
-            return 1;
-
-        }
     }
 }
