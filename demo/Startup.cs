@@ -35,6 +35,20 @@ namespace demo
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
+            //添加缓存服务（P46）
+            services.AddResponseCaching();
+
+            //支持高级 CacheHeaders，并进行全局配置（P48）
+            services.AddHttpCacheHeaders(expires =>
+            {
+                expires.MaxAge = 60;
+                expires.CacheLocation = Marvin.Cache.Headers.CacheLocation.Private;
+            }, validation =>
+            {
+                //如果响应过期，必须重新验证
+                validation.MustRevalidate = true;
+            });
+
             /*
             * .Net Core 默认使用 Problem details for HTTP APIs RFC (7807) 标准
             * - 为所需错误信息的应用，定义了通用的错误格式
@@ -59,8 +73,14 @@ namespace demo
             //api以下是较新的写法，AddXmlDataContractSerializerFormatters() 等方法使用更方便。
             services.AddControllers(setup =>
                 {
-                    //启用406状态码
+                    //启用406状态码（P7）
                     setup.ReturnHttpNotAcceptable = true;
+
+                    //配置缓存字典（P46）
+                    //options.CacheProfiles.Add("120sCacheProfile", new CacheProfile
+                    //{
+                    //    Duration = 120
+                    //});
                 })
                 //默认格式取决于序列化工具的添加顺序 P32
                 .AddNewtonsoftJson(options => //第三方 JSON 序列化和反序列化工具（会替换掉原本默认的 JSON 序列化工具）（P32）
@@ -168,17 +188,6 @@ namespace demo
         /// <param name="env"></param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            #region Nlog记日志
-
-            //将日志记录到数据库                 config/NLog.config
-            NLog.LogManager.LoadConfiguration("nlog.config").GetCurrentClassLogger();
-            //NLog.LogManager.Configuration.Variables["connectionString"] =
-            //    Configuration.GetConnectionString("DefaultConnection");
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); //避免日志中的中文输出乱码
-
-            #endregion
-
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -210,6 +219,10 @@ namespace demo
                 c.RoutePrefix = string.Empty;
                 c.DocumentTitle = "JacobCai API";
             });
+
+            //缓存中间件
+            //app.UseResponseCaching();  //（P46）
+            app.UseHttpCacheHeaders(); //（P48）
 
             //路由中间件
             app.UseRouting();

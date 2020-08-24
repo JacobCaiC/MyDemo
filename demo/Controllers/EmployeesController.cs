@@ -11,11 +11,13 @@ using MyDemo.Services;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Marvin.Cache.Headers;
 
 namespace MyDemo.Controllers
 {
     [ApiController]
     [Route("api/companies/{companyId}/employees")]
+    //[ResponseCache(CacheProfileName = "120sCacheProfile")]  //整个controller允许被缓存120秒（P46）
     public class EmployeesController : ControllerBase
     {
         private readonly ICompanyRepository _companyRepository;
@@ -35,7 +37,9 @@ namespace MyDemo.Controllers
         /// FromQuery(Name = "gender")指定参数名
         [HttpGet(Name = nameof(GetEmployeesForCompany))]
         //单独指定这个方法的缓存策略
-        //[ResponseCache(Duration = 60)]   
+        //[ResponseCache(Duration = 60)]                                           //（P46）
+        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 1800)] //（P48）
+        [HttpCacheValidation(MustRevalidate = false)]                              //（P48）
         public async Task<ActionResult<IEnumerable<EmployeeDto>>> 
             GetEmployeesForCompany(Guid companyId, [FromQuery]EmployeeDtoParameters parameters) 
              {

@@ -6,7 +6,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MyDemo.Models;
 using System;
-using NLog.Web;
 
 namespace demo
 {
@@ -46,17 +45,7 @@ namespace demo
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>()
-                        //这里是配置log的
-                        .ConfigureLogging((hostingContext, builder) =>
-                        {
-                            builder.ClearProviders();
-                            builder.SetMinimumLevel(LogLevel.Trace); //使用Nlogs的配置
-                            //builder.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
-                            //builder.AddConsole();
-                            //builder.AddDebug();
-                        })
-                        .UseNLog(); // NLog: setup NLog for Dependency injection. 3.0中这样添加;
+                    webBuilder.UseStartup<Startup>();
                 });
     }
 }

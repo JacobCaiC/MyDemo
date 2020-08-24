@@ -12,6 +12,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Net.Http.Headers;
+using MyDemo.ActionConstraints;
 
 
 namespace MyDemo.Controllers
@@ -40,13 +41,16 @@ namespace MyDemo.Controllers
         {
             _companyRepository = companyRepository ?? throw new ArgumentNullException(nameof(companyRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-            _propertyMappingService = propertyMappingService ?? throw new ArgumentNullException(nameof(propertyMappingService));
-            _propertyCheckerService = propertyCheckerService ?? throw new ArgumentNullException(nameof(propertyCheckerService));
+            _propertyMappingService =
+                propertyMappingService ?? throw new ArgumentNullException(nameof(propertyMappingService));
+            _propertyCheckerService =
+                propertyCheckerService ?? throw new ArgumentNullException(nameof(propertyCheckerService));
         }
 
         #region Controllers
 
         #region HttpGet
+
         /// <summary>
         /// 查询所有企业;Head 请求只会返回 Header 信息，没有 Body
         /// </summary>
@@ -54,18 +58,18 @@ namespace MyDemo.Controllers
         [HttpGet(Name = nameof(GetCompanies))]
         [HttpHead] //即支持GET又支持HEAD,GET返回状态码body,添加对 Http Head 的支持，Head 请求只会返回 Header 信息，没有 Body（P16）
         public async Task<IActionResult> GetCompanies(
-            [FromQuery]CompanyDtoParameters parameters)
+            [FromQuery] CompanyDtoParameters parameters)
         {
             //判断Uri query 字符串中的 orderby 是否合法（P38）
             if (!_propertyMappingService.ValidMappingExistsFor<CompanyDto, Company>(parameters.OrderBy))
             {
-                return BadRequest();  //返回状态码400
+                return BadRequest(); //返回状态码400
             }
 
             //判断Uri query 字符串中的 fields 是否合法（P39）
             if (!_propertyCheckerService.TypeHasProperties<CompanyDto>(parameters.Fields))
             {
-                return BadRequest();  //返回状态码400
+                return BadRequest(); //返回状态码400
             }
 
             //GetCompaniesAsync(parameters) 返回的是经过翻页处理的 PagedList<T>（P35）
@@ -117,7 +121,7 @@ namespace MyDemo.Controllers
             var shapedCompaniesWithLinks = shapedData.Select(c =>
             {
                 var companyDict = c as IDictionary<string, object>;
-                var links = CreateLinksForCompany((Guid)companyDict["Id"], null);
+                var links = CreateLinksForCompany((Guid) companyDict["Id"], null);
                 companyDict.Add("links", links);
                 return companyDict;
             });
@@ -127,7 +131,7 @@ namespace MyDemo.Controllers
                 value = shapedCompaniesWithLinks,
                 links = CreateLinksForCompany(parameters, companies.HasPrevious, companies.HasNext)
             };
-            return Ok(linkedCollectionResource);  //返回状态码200
+            return Ok(linkedCollectionResource); //返回状态码200
             //return Ok(companyDtos.ShapeData(parameters.Fields));
             //return new JsonResult(companies);
         }
@@ -148,14 +152,14 @@ namespace MyDemo.Controllers
         [HttpGet("{companyId}", Name = nameof(GetCompany))]
         public async Task<IActionResult> GetCompany(Guid companyId,
             string fields,
-            [FromHeader(Name="Accept")] string acceptMediaType) //从请求header把accept取出来赋给acceptMediaType
+            [FromHeader(Name = "Accept")] string acceptMediaType) //从请求header把accept取出来赋给acceptMediaType
         {
             //var exist = await _companyRepository.CompanyExistsAsync(companyId);
 
             //判断Uri query 字符串中的 fields 是否合法（P39）
             if (!_propertyCheckerService.TypeHasProperties<CompanyDto>(fields))
             {
-                return BadRequest();  //返回状态码400
+                return BadRequest(); //返回状态码400
             }
 
             //尝试解析 MediaTypeHeaderValue（P43）
@@ -169,22 +173,79 @@ namespace MyDemo.Controllers
             var company = await _companyRepository.GetCompanyAsync(companyId);
             if (company == null)
             {
-                return NotFound();
+                return NotFound(); //返回状态码404
             }
 
+            //是否需要 links（HATEOAS）（P41-43）
+            bool includeLinks = parsedAcceptMediaType.SubTypeWithoutSuffix
+                .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase); //大小写不敏感
+            //是否需要 Full Dto
+            bool isFull = parsedAcceptMediaType.SubTypeWithoutSuffix
+                .ToString()
+                .Contains("full", StringComparison.InvariantCultureIgnoreCase);
 
-            var links = CreateLinksForCompany(companyId, fields);
+            var shapedData = isFull
+                ? _mapper.Map<CompanyFullDto>(company).ShapeData(fields)
+                : _mapper.Map<CompanyFriendlyDto>(company).ShapeData(fields);
 
-            var linkedDict = _mapper.Map<CompanyDto>(company).ShapeData(fields)
-                as IDictionary<string, object>;
-            linkedDict.Add("links",links);
-
-            return Ok(linkedDict);
+            if (includeLinks)
+            {
+                var companyDict = shapedData as IDictionary<string, object>;
+                var links = CreateLinksForCompany(companyId, fields);
+                companyDict.Add("links", links);
+                return Ok(companyDict);
+            }
+            return Ok(shapedData);
         }
 
         #endregion HttpGet
 
         #region HttpPost
+
+
+        //含 KankruptTime 的 Create Company，使用 CompanyAddWithBankruptTimeDto（视频P44）
+        [HttpPost(Name = nameof(CreateCompanyWithBankruptTime))]
+        [RequestHeaderMatchesMediaType("Content-Type", //当 Content-Type 是以下 value 时，使用该方法（相当于路由）（视频P44）
+                                                      "application/vnd.company.companyforcreationwithbankrupttime+json")]
+        //指明该方法可以消费哪些格式的 Content-Type（视频P44）
+        [Consumes("application/vnd.company.companyforcreationwithbankrupttime+json")]
+        public async Task<IActionResult> CreateCompanyWithBankruptTime([FromBody] CompanyAddWithBankruptTimeDto companyWithBankruptTime,
+                                                                       [FromHeader(Name="Accept")]
+                                                                       string acceptMediaType)
+        {
+            //尝试解析 MediaTypeHeaderValue（视频P43）
+            if (!MediaTypeHeaderValue.TryParse(acceptMediaType, out MediaTypeHeaderValue parsedAcceptMediaType))
+            {
+                return BadRequest();
+            }
+
+            //是否需要 links（HATEOAS）（视频P41-43）
+            bool includeLinks = parsedAcceptMediaType.SubTypeWithoutSuffix
+                               .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase); //大小写不敏感
+            //是否需要 Full Dto
+            bool isFull = parsedAcceptMediaType.SubTypeWithoutSuffix
+                         .ToString()
+                         .Contains("full", StringComparison.InvariantCultureIgnoreCase);
+
+            var entity = _mapper.Map<Company>(companyWithBankruptTime);
+            _companyRepository.AddCompany(entity);
+            await _companyRepository.SaveAsync();
+
+            var shapedData = isFull ?
+                             _mapper.Map<CompanyFullDto>(entity).ShapeData(null)
+                             :
+                             _mapper.Map<CompanyFriendlyDto>(entity).ShapeData(null);
+
+            if (includeLinks)
+            {
+                var companyDict = shapedData as IDictionary<string, object>;
+                var links = CreateLinksForCompany(entity.Id, null);
+                companyDict.Add("links", links);
+                return CreatedAtRoute(nameof(GetCompany), new { companyId = entity.Id }, companyDict);
+            }
+
+            return CreatedAtRoute(nameof(GetCompany), new { companyId = entity.Id }, shapedData);
+        }
 
         /// <summary>
         /// CompanyAddDto创建公司 
@@ -192,7 +253,14 @@ namespace MyDemo.Controllers
         /// <param name="company"></param>
         /// <returns></returns>
         [HttpPost(Name = nameof(CreateCompany))]
-        public async Task<IActionResult> CreateCompany([FromBody]CompanyAddDto companyAddDto){   //Task<IActionResult> = Task<ActionResult<CompanyDto>
+        [RequestHeaderMatchesMediaType("Content-Type", //当 Content-Type 是以下 value 时，使用该方法（相当于路由）（视频P44）
+            "application/json",
+            "application/vnd.company.companyforcreation+json")]
+        //指明该方法可以消费哪些格式的 Content-Type（视频P44）
+        [Consumes("application/json", "application/vnd.company.companyforcreation+json")]
+        public async Task<IActionResult> CreateCompany([FromBody] CompanyAddDto companyAddDto)
+        {
+            //Task<IActionResult> = Task<ActionResult<CompanyDto>
             //使用 [ApiController] 属性后，会自动返回400错误，无需再使用以下代码：
             //if (!ModelState.IsValid)
             //{
@@ -214,10 +282,10 @@ namespace MyDemo.Controllers
             var links = CreateLinksForCompany(returnDto.Id, null);
             var linkedDict = returnDto.ShapeData(null)
                 as IDictionary<string, object>;
-            linkedDict.Add("links",links);
+            linkedDict.Add("links", links);
             //返回状态码201
             //通过使用 CreatedAtRoute 返回时可以在 Header 中添加一个地址（Loaction）包含一个url找到新建资源
-            return CreatedAtRoute(nameof(GetCompany), new { companyId = linkedDict["Id"] },
+            return CreatedAtRoute(nameof(GetCompany), new {companyId = linkedDict["Id"]},
                 linkedDict);
         }
 
@@ -255,9 +323,11 @@ namespace MyDemo.Controllers
             await _companyRepository.SaveAsync();
             return NoContent();
         }
+
         #endregion Controllers
 
         #region Functions
+
         /// <summary>
         /// 生成上一页或下一页的 URI（P35）
         /// </summary>
@@ -265,7 +335,7 @@ namespace MyDemo.Controllers
         /// <param name="type"></param>
         /// <returns></returns>
         private string CreateCompaniesResourceUri(CompanyDtoParameters parameters,
-                                                  ResourceUriType type)
+            ResourceUriType type)
         {
             switch (type)
             {
@@ -281,8 +351,9 @@ namespace MyDemo.Controllers
                             companyName = parameters.CompanyName,
                             searchTerm = parameters.SearchTerm,
                             orderBy = parameters.OrderBy, //排序（P38）
-                            fields = parameters.Fields  //数据塑形（P39）
-                        }); ;
+                            fields = parameters.Fields //数据塑形（P39）
+                        });
+                    ;
                 case ResourceUriType.NextPage: //下一页
                     return Url.Link(
                         nameof(GetCompanies),
@@ -323,30 +394,31 @@ namespace MyDemo.Controllers
             if (string.IsNullOrWhiteSpace(fields))
             {
                 links.Add(
-                    new LinkDto(Url.Link(nameof(GetCompany), new { companyId }),//href - 超链接
-                        "self",                                                             //rel - 与当前资源的关系或描述
-                        "GET"));                                                         //method - 方法
+                    new LinkDto(Url.Link(nameof(GetCompany), new {companyId}), //href - 超链接
+                        "self", //rel - 与当前资源的关系或描述
+                        "GET")); //method - 方法
             }
             else
             {
                 links.Add(
-                    new LinkDto(Url.Link(nameof(GetCompany), new { companyId, fields }),
+                    new LinkDto(Url.Link(nameof(GetCompany), new {companyId, fields}),
                         "self",
                         "GET"));
             }
+
             //DeleteCompany 的 link
             links.Add(
-                new LinkDto(Url.Link(nameof(DeleteCompany), new { companyId }),
+                new LinkDto(Url.Link(nameof(DeleteCompany), new {companyId}),
                     "delete_company",
                     "DELETE"));
             //CreateEmployeeForCompany 的 link
             links.Add(
-                new LinkDto(Url.Link(nameof(EmployeesController.CreateEmployeeForCompany), new { companyId }),
+                new LinkDto(Url.Link(nameof(EmployeesController.CreateEmployeeForCompany), new {companyId}),
                     "create_employee_for_company",
                     "POST"));
             //GetEmployeesForCompany 的 link
             links.Add(
-                new LinkDto(Url.Link(nameof(EmployeesController.GetEmployeesForCompany), new { companyId }),
+                new LinkDto(Url.Link(nameof(EmployeesController.GetEmployeesForCompany), new {companyId}),
                     "employees",
                     "GET"));
             return links;
@@ -359,7 +431,8 @@ namespace MyDemo.Controllers
         /// <param name="hasPrevious">是否有上一页</param>
         /// <param name="hasNext">是否有下一页</param>
         /// <returns>GetCompanies 集合资源的 links</returns>
-        private IEnumerable<LinkDto> CreateLinksForCompany(CompanyDtoParameters parameters, bool hasPrevious, bool hasNext)
+        private IEnumerable<LinkDto> CreateLinksForCompany(CompanyDtoParameters parameters, bool hasPrevious,
+            bool hasNext)
         {
             var links = new List<LinkDto>();
             //CurrentPage 当前页链接
@@ -373,6 +446,7 @@ namespace MyDemo.Controllers
                     "previous_page",
                     "GET"));
             }
+
             if (hasNext)
             {
                 //NextPage 下一页链接
@@ -380,11 +454,10 @@ namespace MyDemo.Controllers
                     "next_page",
                     "GET"));
             }
+
             return links;
         }
 
         #endregion Functions
-
-
     }
 }

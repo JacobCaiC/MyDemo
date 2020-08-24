@@ -4,6 +4,18 @@
         <name>MyDemo</name>
     </assembly>
     <members>
+        <member name="T:MyDemo.ActionConstraints.RequestHeaderMatchesMediaTypeAttribute">
+            <summary>
+            自定义 Attribute，根据 Header 信息判断方法是否能处理请求（视频P44）
+            </summary>
+        </member>
+        <member name="M:MyDemo.ActionConstraints.RequestHeaderMatchesMediaTypeAttribute.Accept(Microsoft.AspNetCore.Mvc.ActionConstraints.ActionConstraintContext)">
+            <summary>
+            判断该方法是否能处理这个请求
+            </summary>
+            <param name="context">上下文</param>
+            <returns>是否能处理这个请求</returns>
+        </member>
         <member name="T:MyDemo.Controllers.CompaniesController">
             <summary>
             Controller继承ControllerBase，增加视图支持
@@ -232,6 +244,16 @@
             <summary>
             输入使用的Dto
             查询、插入、更新应该使用不同的Dto，便于业务升级与重构
+            </summary>
+        </member>
+        <member name="T:MyDemo.Models.Dto.CompanyAddWithBankruptTimeDto">
+            <summary>
+            Create Company 时使用的 Dto，增加了 BankruptTime 属性（P44）
+            </summary>
+        </member>
+        <member name="T:MyDemo.Models.Dto.CompanyFriendlyDto">
+            <summary>
+            输出 Company 使用的 Friendly Dto，仅含 Company 的部分属性/字段（P43）
             </summary>
         </member>
         <member name="T:MyDemo.Models.Dto.CompanyFullDto">
