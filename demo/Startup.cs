@@ -2,21 +2,20 @@ using AutoMapper;
 using demo.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
 using MyDemo.Services;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Formatters;
-using StackExchange.Redis;
+using Microsoft.OpenApi.Models;
+using MyDemo.Models.Elasticsearch;
 
 namespace demo
 {
@@ -35,9 +34,6 @@ namespace demo
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
-            //添加缓存服务（P46）
-            services.AddResponseCaching();
-
             //支持高级 CacheHeaders，并进行全局配置（P48）
             services.AddHttpCacheHeaders(expires =>
             {
@@ -49,6 +45,8 @@ namespace demo
                 validation.MustRevalidate = true;
             });
 
+            //添加缓存服务（P46）
+            services.AddResponseCaching();
             /*
             * .Net Core 默认使用 Problem details for HTTP APIs RFC (7807) 标准
             * - 为所需错误信息的应用，定义了通用的错误格式
@@ -147,6 +145,7 @@ namespace demo
             services.AddSingleton<OrderServiceOptions>();
             services.AddSingleton<IOrderService, OrderService>();
 
+            services.AddSingleton<IESClientProvider, ESClientProvider>();
 
             var connection = Configuration.GetConnectionString("MySqlConnection");
             services.AddDbContext<DBContext>(options => options.UseMySql(connection));
@@ -163,7 +162,7 @@ namespace demo
                     {
                         Name = "JacobCai",
                         Email = "cbb2@shanghai-electric.com",
-                        Url = new Uri("https://twitter.com/spboyer"),
+                        //Url = new Uri("https://twitter.com/spboyer"),
                     },
                     License = new OpenApiLicense
                     {
@@ -188,6 +187,14 @@ namespace demo
         /// <param name="env"></param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            //swagger
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                c.RoutePrefix = string.Empty;
+                c.DocumentTitle = "JacobCai API";
+            });
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -211,18 +218,10 @@ namespace demo
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
-            //swagger
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-                c.RoutePrefix = string.Empty;
-                c.DocumentTitle = "JacobCai API";
-            });
 
             //缓存中间件
-            //app.UseResponseCaching();  //（P46）
-            app.UseHttpCacheHeaders(); //（P48）
+            app.UseResponseCaching(); //（P46）
+            //app.UseHttpCacheHeaders(); //（P48）UseResponseCaching之前使用
 
             //路由中间件
             app.UseRouting();

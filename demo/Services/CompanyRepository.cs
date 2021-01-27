@@ -11,13 +11,13 @@ using MyDemo.Models.Dto;
 
 namespace MyDemo.Services
 {
-    public class CompanyRepository :ICompanyRepository
+    public class CompanyRepository : ICompanyRepository
     {
         private readonly DBContext _context;
 
         private readonly IPropertyMappingService _propertyMappingService;
 
-        public CompanyRepository(DBContext context,IPropertyMappingService propertyMappingService)
+        public CompanyRepository(DBContext context, IPropertyMappingService propertyMappingService)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _propertyMappingService = propertyMappingService
@@ -35,6 +35,7 @@ namespace MyDemo.Services
             {
                 throw new ArgumentNullException(nameof(parameters));
             }
+
             var queryExpression = _context.Companies as IQueryable<Company>;
 
             //查找指定公司
@@ -49,7 +50,7 @@ namespace MyDemo.Services
             {
                 parameters.SearchTerm = parameters.SearchTerm.Trim();
                 queryExpression = queryExpression.Where(x => x.Name.Contains(parameters.SearchTerm)
-                                                            || x.Introduction.Contains(parameters.SearchTerm));
+                                                             || x.Introduction.Contains(parameters.SearchTerm));
             }
 
             //排序P38
@@ -65,7 +66,7 @@ namespace MyDemo.Services
             //queryExpression = queryExpression.Skip(parameters.PageSize * (parameters.PageNumber - 1))
             //    .Take(parameters.PageSize);
             ////ToListAsync真正查询数据库
-            return await PagedList<Company>.CreateAsync(queryExpression,parameters.PageNumber,parameters.PageSize);
+            return await PagedList<Company>.CreateAsync(queryExpression, parameters.PageNumber, parameters.PageSize);
         }
 
         /// <summary>
@@ -82,6 +83,16 @@ namespace MyDemo.Services
 
             return await _context.Companies
                 .FirstOrDefaultAsync(x => x.Id == companyId);
+        }
+
+        /// <summary>
+        /// all Companies
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <returns></returns>
+        public List<Company> GetAllCompanies()
+        {
+            return _context.Companies.ToList();
         }
 
         /// <summary>
@@ -166,12 +177,12 @@ namespace MyDemo.Services
             return await _context.Companies.AnyAsync(x => x.Id == companyId);
         }
 
-       /// <summary>
-       /// 通过公司id和员工id获取
-       /// </summary>
-       /// <param name="companyId"></param>
-       /// <param name="employeeId"></param>
-       /// <returns></returns>
+        /// <summary>
+        /// 通过公司id和员工id获取
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <param name="employeeId"></param>
+        /// <returns></returns>
         public async Task<Employee> GetEmployeeAsync(Guid companyId, Guid employeeId)
         {
             if (companyId == Guid.Empty)
@@ -242,7 +253,6 @@ namespace MyDemo.Services
             }
 
             return await queryExpression.ToListAsync();
-
         }
 
         /// <summary>
@@ -293,7 +303,5 @@ namespace MyDemo.Services
         {
             return await _context.SaveChangesAsync() >= 0;
         }
-
     }
 }
-

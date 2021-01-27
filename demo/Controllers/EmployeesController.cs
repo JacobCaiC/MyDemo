@@ -37,9 +37,9 @@ namespace MyDemo.Controllers
         /// FromQuery(Name = "gender")指定参数名
         [HttpGet(Name = nameof(GetEmployeesForCompany))]
         //单独指定这个方法的缓存策略
-        //[ResponseCache(Duration = 60)]                                           //（P46）
-        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 1800)] //（P48）
-        [HttpCacheValidation(MustRevalidate = false)]                              //（P48）
+        //[ResponseCache(Duration = 60)]                                          //（P46）
+        //[HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 1800)] //（P48）
+        //[HttpCacheValidation(MustRevalidate = false)]                              //（P48）
         public async Task<ActionResult<IEnumerable<EmployeeDto>>> 
             GetEmployeesForCompany(Guid companyId, [FromQuery]EmployeeDtoParameters parameters) 
              {
@@ -223,13 +223,13 @@ namespace MyDemo.Controllers
             {
                 return NotFound();
             }
-
+        
             var employeeEntity = await _companyRepository.GetEmployeeAsync(companyId, employeeId);
             if (employeeEntity == null)
             {
                 return NotFound();
             }
-
+        
             _companyRepository.DeleteEmployee(employeeEntity);
             await _companyRepository.SaveAsync();
             return NoContent();
@@ -241,11 +241,11 @@ namespace MyDemo.Controllers
         /// </summary>
         /// <param name="modelStateDictionary"></param>
         /// <returns></returns>
-        public override ActionResult ValidationProblem(ModelStateDictionary modelStateDictionary)
-        {
-            var options = HttpContext.RequestServices
-                .GetRequiredService<IOptions<ApiBehaviorOptions>>();
-            return (ActionResult)options.Value.InvalidModelStateResponseFactory(ControllerContext);
-        }
+        // public override ActionResult ValidationProblem(ModelStateDictionary modelStateDictionary)
+        // {
+        //     var options = HttpContext.RequestServices
+        //         .GetRequiredService<IOptions<ApiBehaviorOptions>>();
+        //     return (ActionResult)options.Value.InvalidModelStateResponseFactory(ControllerContext);
+        // }
     }
 }

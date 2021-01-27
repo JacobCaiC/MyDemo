@@ -22,6 +22,7 @@ namespace MyDemo.Profiles
 
             CreateMap<CompanyAddDto, Company>();
             CreateMap<Company, CompanyFullDto>();
+            CreateMap<Company, CompanyFriendlyDto>();
             CreateMap<CompanyAddWithBankruptTimeDto, Company>();
         }
     }

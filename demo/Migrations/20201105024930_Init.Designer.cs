@@ -9,8 +9,8 @@ using demo.Data;
 namespace MyDemo.Migrations
 {
     [DbContext(typeof(DBContext))]
-    [Migration("20200805082830_AddBankruptTime")]
-    partial class AddBankruptTime
+    [Migration("20201105024930_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

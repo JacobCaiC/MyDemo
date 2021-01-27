@@ -14,6 +14,7 @@ namespace MyDemo.Services
         Task<Company> GetCompanyAsync(Guid companyId);
         Task<IEnumerable<Company>> GetCompaniesAsync(IEnumerable<Guid> companyIds);
         Task<PagedList<Company>> GetCompaniesAsync(CompanyDtoParameters parameters);
+        List<Company> GetAllCompanies();
         void AddCompany(Company company);
         void UpdateCompany(Company company);
         void DeleteCompany(Company company);

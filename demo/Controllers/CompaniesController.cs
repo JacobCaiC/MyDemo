@@ -203,49 +203,49 @@ namespace MyDemo.Controllers
         #region HttpPost
 
 
-        //含 KankruptTime 的 Create Company，使用 CompanyAddWithBankruptTimeDto（视频P44）
-        [HttpPost(Name = nameof(CreateCompanyWithBankruptTime))]
-        [RequestHeaderMatchesMediaType("Content-Type", //当 Content-Type 是以下 value 时，使用该方法（相当于路由）（视频P44）
-                                                      "application/vnd.company.companyforcreationwithbankrupttime+json")]
-        //指明该方法可以消费哪些格式的 Content-Type（视频P44）
-        [Consumes("application/vnd.company.companyforcreationwithbankrupttime+json")]
-        public async Task<IActionResult> CreateCompanyWithBankruptTime([FromBody] CompanyAddWithBankruptTimeDto companyWithBankruptTime,
-                                                                       [FromHeader(Name="Accept")]
-                                                                       string acceptMediaType)
-        {
-            //尝试解析 MediaTypeHeaderValue（视频P43）
-            if (!MediaTypeHeaderValue.TryParse(acceptMediaType, out MediaTypeHeaderValue parsedAcceptMediaType))
-            {
-                return BadRequest();
-            }
-
-            //是否需要 links（HATEOAS）（视频P41-43）
-            bool includeLinks = parsedAcceptMediaType.SubTypeWithoutSuffix
-                               .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase); //大小写不敏感
-            //是否需要 Full Dto
-            bool isFull = parsedAcceptMediaType.SubTypeWithoutSuffix
-                         .ToString()
-                         .Contains("full", StringComparison.InvariantCultureIgnoreCase);
-
-            var entity = _mapper.Map<Company>(companyWithBankruptTime);
-            _companyRepository.AddCompany(entity);
-            await _companyRepository.SaveAsync();
-
-            var shapedData = isFull ?
-                             _mapper.Map<CompanyFullDto>(entity).ShapeData(null)
-                             :
-                             _mapper.Map<CompanyFriendlyDto>(entity).ShapeData(null);
-
-            if (includeLinks)
-            {
-                var companyDict = shapedData as IDictionary<string, object>;
-                var links = CreateLinksForCompany(entity.Id, null);
-                companyDict.Add("links", links);
-                return CreatedAtRoute(nameof(GetCompany), new { companyId = entity.Id }, companyDict);
-            }
-
-            return CreatedAtRoute(nameof(GetCompany), new { companyId = entity.Id }, shapedData);
-        }
+        // //含 KankruptTime 的 Create Company，使用 CompanyAddWithBankruptTimeDto（视频P44）
+        // [HttpPost(Name = nameof(CreateCompanyWithBankruptTime))]
+        // [RequestHeaderMatchesMediaType("Content-Type", //当 Content-Type 是以下 value 时，使用该方法（相当于路由）（视频P44）
+        //                                               "application/vnd.company.companyforcreationwithbankrupttime+json")]
+        // //指明该方法可以消费哪些格式的 Content-Type（视频P44）
+        // [Consumes("application/vnd.company.companyforcreationwithbankrupttime+json")]
+        // public async Task<IActionResult> CreateCompanyWithBankruptTime([FromBody] CompanyAddWithBankruptTimeDto companyWithBankruptTime,
+        //                                                                [FromHeader(Name="Accept")]
+        //                                                                string acceptMediaType)
+        // {
+        //     //尝试解析 MediaTypeHeaderValue（视频P43）
+        //     if (!MediaTypeHeaderValue.TryParse(acceptMediaType, out MediaTypeHeaderValue parsedAcceptMediaType))
+        //     {
+        //         return BadRequest();
+        //     }
+        //
+        //     //是否需要 links（HATEOAS）（视频P41-43）
+        //     bool includeLinks = parsedAcceptMediaType.SubTypeWithoutSuffix
+        //                        .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase); //大小写不敏感
+        //     //是否需要 Full Dto
+        //     bool isFull = parsedAcceptMediaType.SubTypeWithoutSuffix
+        //                  .ToString()
+        //                  .Contains("full", StringComparison.InvariantCultureIgnoreCase);
+        //
+        //     var entity = _mapper.Map<Company>(companyWithBankruptTime);
+        //     _companyRepository.AddCompany(entity);
+        //     await _companyRepository.SaveAsync();
+        //
+        //     var shapedData = isFull ?
+        //                      _mapper.Map<CompanyFullDto>(entity).ShapeData(null)
+        //                      :
+        //                      _mapper.Map<CompanyFriendlyDto>(entity).ShapeData(null);
+        //
+        //     if (includeLinks)
+        //     {
+        //         var companyDict = shapedData as IDictionary<string, object>;
+        //         var links = CreateLinksForCompany(entity.Id, null);
+        //         companyDict.Add("links", links);
+        //         return CreatedAtRoute(nameof(GetCompany), new { companyId = entity.Id }, companyDict);
+        //     }
+        //
+        //     return CreatedAtRoute(nameof(GetCompany), new { companyId = entity.Id }, shapedData);
+        // }
 
         /// <summary>
         /// CompanyAddDto创建公司 
