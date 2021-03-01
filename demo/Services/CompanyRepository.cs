@@ -25,6 +25,25 @@ namespace MyDemo.Services
         }
 
         /// <summary>
+        /// GetAllCompanies
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <returns></returns>
+        public List<Company> GetAllCompanies()
+        {
+            return _context.Companies.ToList();
+        }
+
+        /// <summary>
+        /// GetCompaniesAsync
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<Company>> GetCompaniesAsync()
+        {
+            return await _context.Companies.ToListAsync();
+        }
+
+        /// <summary>
         /// 条件查询
         /// </summary>
         /// <param name="parameters"></param>
@@ -85,15 +104,6 @@ namespace MyDemo.Services
                 .FirstOrDefaultAsync(x => x.Id == companyId);
         }
 
-        /// <summary>
-        /// all Companies
-        /// </summary>
-        /// <param name="companyId"></param>
-        /// <returns></returns>
-        public List<Company> GetAllCompanies()
-        {
-            return _context.Companies.ToList();
-        }
 
         /// <summary>
         /// 通过id集合获取

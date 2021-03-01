@@ -52,6 +52,18 @@ namespace MyDemo.Controllers
         #region HttpGet
 
         /// <summary>
+        /// GetCompanyDtosTask
+        /// </summary>
+        /// <returns></returns>
+        // [HttpGet(Name = nameof(GetCompanyDtos))]
+        // public async Task<ActionResult<IEnumerable<CompanyDto>>> GetCompanyDtos()
+        // {
+        //     var companies = await _companyRepository.GetCompaniesAsync();
+        //     var companyDtos = _mapper.Map<IEnumerable<CompanyDto>>(companies);
+        //     return Ok(companyDtos);
+        // }
+
+        /// <summary>
         /// 查询所有企业;Head 请求只会返回 Header 信息，没有 Body
         /// </summary>
         /// <returns></returns>
@@ -195,13 +207,13 @@ namespace MyDemo.Controllers
                 companyDict.Add("links", links);
                 return Ok(companyDict);
             }
+
             return Ok(shapedData);
         }
 
         #endregion HttpGet
 
         #region HttpPost
-
 
         // //含 KankruptTime 的 Create Company，使用 CompanyAddWithBankruptTimeDto（视频P44）
         // [HttpPost(Name = nameof(CreateCompanyWithBankruptTime))]

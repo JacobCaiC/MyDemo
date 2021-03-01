@@ -37,6 +37,7 @@ namespace MyDemo.Profiles
             {
                 throw new ArgumentOutOfRangeException(nameof(dateOfBirth));
             }
+
             int age = dateOfNow.Year - dateOfBirth.Year;
             if (dateOfNow.Month < dateOfBirth.Month)
             {
@@ -46,6 +47,7 @@ namespace MyDemo.Profiles
             {
                 age--;
             }
+
             return age;
         }
     }
