@@ -14,7 +14,10 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Magicodes.ExporterAndImporter.Builder;
+using Magicodes.ExporterAndImporter.Filters;
 using Microsoft.OpenApi.Models;
+using MyDemo.Models;
 using MyDemo.Models.Elasticsearch;
 
 namespace demo
@@ -79,6 +82,8 @@ namespace demo
                     //{
                     //    Duration = 120
                     //});
+
+                    setup.Filters.Add(typeof(MagicodesFilter));
                 })
                 //默认格式取决于序列化工具的添加顺序 P32
                 .AddNewtonsoftJson(options => //第三方 JSON 序列化和反序列化工具（会替换掉原本默认的 JSON 序列化工具）（P32）
@@ -170,6 +175,7 @@ namespace demo
                         Url = new Uri("https://example.com/license"),
                     }
                 });
+                c.OperationFilter<AddRequiredHeaderParameter>();
 
                 // 为 Swagger JSON and UI设置xml文档注释路径
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
@@ -218,13 +224,13 @@ namespace demo
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
-
             //缓存中间件
             app.UseResponseCaching(); //（P46）
             //app.UseHttpCacheHeaders(); //（P48）UseResponseCaching之前使用
 
             //路由中间件
             app.UseRouting();
+            //app.UseMagiCodesIE();
 
             //添加授权
             app.UseAuthorization();
