@@ -75,7 +75,7 @@ namespace demo
             services.AddControllers(setup =>
                 {
                     //启用406状态码（P7）
-                    setup.ReturnHttpNotAcceptable = true;
+                    //setup.ReturnHttpNotAcceptable = true;
 
                     //配置缓存字典（P46）
                     //options.CacheProfiles.Add("120sCacheProfile", new CacheProfile
@@ -83,7 +83,7 @@ namespace demo
                     //    Duration = 120
                     //});
 
-                    setup.Filters.Add(typeof(MagicodesFilter));
+                    //setup.Filters.Add(typeof(MagicodesFilter));
                 })
                 //默认格式取决于序列化工具的添加顺序 P32
                 .AddNewtonsoftJson(options => //第三方 JSON 序列化和反序列化工具（会替换掉原本默认的 JSON 序列化工具）（P32）
@@ -230,7 +230,7 @@ namespace demo
 
             //路由中间件
             app.UseRouting();
-            //app.UseMagiCodesIE();
+            app.UseMagiCodesIE();
 
             //添加授权
             app.UseAuthorization();
