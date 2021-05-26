@@ -313,5 +313,47 @@ namespace MyDemo.Services
         {
             return await _context.SaveChangesAsync() >= 0;
         }
+
+        /// <summary>
+        /// 基础查询
+        /// https://mp.weixin.qq.com/s/Pzqr6a4bfTgFoB4_40JxrA
+        /// </summary>
+        public void Query()
+        {
+            _context.Set<Company>().ToList();
+
+
+            //查询单个
+            //如果有多个实体符合筛选部分， SingleOrDefaultAsync 将引发异常。
+            //如果有多个实体符合筛选部分， FirstOrDefaultAsync 不引发异常。
+            _context.Movie.FirstOrDefaultAsync(m => m.Id == 1);
+            //在大部分基架代码中，FindAsync 可用于替代 FirstOrDefaultAsync ，查找具有主键 (PK) 的实体。
+            //如果具有 PK 的实体正在由上下文跟踪，会返回该实体且不向 DB 发出请求。
+            _context.Movie.FindAsync(1);
+
+            //查询指定列
+            _context.Set<Company>().AsNoTracking().Where(t => t.Id == Guid.NewGuid())
+                .Select(t => new {t.Country, t.Industry})
+                .FirstOrDefaultAsync();
+
+            //join()ß
+            //两表不必含有外键关系，需要代码手动指定连接外键相等（具有可拓展性，除了值相等，还能指定是>,<以及其他对两表的相应键的关系）以及结果字段。
+            var wholeRecord1 =
+                _context.Employees.Join(_context.Companies, a => a.CompanyId, g => g.Id,
+                    (a, g) => new {a.FirstName, a.CompanyId, g.Name});
+            //Include()
+            //两表必须含有外键关系，只需要指定键名对应的类属性名即可，不需指定结果字段（即全部映射）。
+            //默认搜索某表时，不会顺带查询外键表，直到真正使用时才会再读取数据库查询；若是使用 Include()，则会在读取本表时把指定的外键表信息也读出来
+            //var wholeRecord = dc.Album.Include("Genre");
+            //或者
+            var wholeRecord = _context.Employees.Include(a => a.Company);
+
+            //跟踪查询
+            _context.Companies.ToListAsync();
+            //非跟踪查询
+            _context.Companies.AsNoTracking().ToListAsync();
+
+
+        }
     }
 }
