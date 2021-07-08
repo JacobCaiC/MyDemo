@@ -1,5 +1,4 @@
-﻿using demo.Data;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyDemo.Entities;
 using System.Collections.Generic;

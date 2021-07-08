@@ -8,6 +8,7 @@ using MyDemo.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -25,7 +26,7 @@ namespace MyDemo.Controllers
     /// 3.推断参数的绑定源 4.Multipart/form-data请求推断 5.错误状态代码的问题详细信息
     /// </summary>
     [ApiController]
-    [Route("api/companies")]
+    [Route("api/[controller]/[action]")]
     //[Route("api/[controller]")]
     public class CompaniesController : ControllerBase
     {
@@ -338,7 +339,48 @@ namespace MyDemo.Controllers
 
         #endregion Controllers
 
+        [HttpGet(Name = nameof(IndexPdf))]
+        public string IndexPdf()
+        {
+            string pdfpath = CreatePdf();//生成pdf，加水印
+            // ViewBag.imgpath = PDFTools.PDFToIMG(AppDomain.CurrentDomain.BaseDirectory + pdfpath, 200);//pdf转图片
+            // return View();
+            return pdfpath;
+        }
+
         #region Functions
+
+        private string CreatePdf()
+        {
+            StringBuilder detail = new StringBuilder();
+            detail.Append(@"<p><span style='FONT-FAMILY:宋体;BACKGROUND:white;COLOR:#333333'></span></p><p><span style='FONT-FAMILY:宋体;BACKGROUND:white;COLOR:#333333'>pdf商品</span></p>");
+            detail.Append(@"<table style='WIDTH:280px' height='159' cellspacing='0' cellpadding='0' width='807' align='center' uetable='null' data-sort='sortDisabled'><tbody>");
+            detail.Append("<tr class='firstRow'>");
+            detail.Append("<td valign='top' width='47'><p><span style='FONT-SIZE:13px;FONT-FAMILY:宋体;BACKGROUND:white;COLOR:#333333'>序号</span></p></td>");
+            detail.Append("<td valign ='top' width='83'><p style='TEXT-ALIGN:center'><span style='FONT-SIZE:13px;FONT-FAMILY:宋体;BACKGROUND:white;COLOR:#333333'>商品名称</span></p></td>");
+            detail.Append("<td valign='top' width='132'><p style='TEXT-ALIGN:center'><span style='FONT-SIZE:13px;FONT-FAMILY:宋体;BACKGROUND:white;COLOR:#333333'>品牌</span></p ></td>");
+            detail.Append("<td valign='top' width='75'><p style='TEXT-ALIGN:center'><span style='FONT-SIZE:13px;FONT-FAMILY:宋体;BACKGROUND:white;COLOR:#333333'>单位</span></span></p></td>");
+            detail.Append("<td valign='top' width='50'><p style='TEXT-ALIGN:center'><span style='FONT-SIZE:13px;FONT-FAMILY:宋体;BACKGROUND:white;COLOR:#333333'>规格</span></p></td>");
+            detail.Append("<td valign='top' width='66'><p style='TEXT-ALIGN:center'><span style='FONT-SIZE:13px;FONT-FAMILY:宋体;BACKGROUND:white;COLOR:#333333'>价格</span></p></td>");
+            detail.Append("</tr>");
+            for (int i = 1; i < 100; i++)
+            {
+                detail.Append("<tr>");
+                detail.Append($"<td valign='top' width='47'>{i}</td>");
+                detail.Append($"<td valign='top' width='83'>商品{i}</td>");
+                detail.Append($"<td valign='top' width='83'>品牌{i}</td>");
+                detail.Append($"<td valign='top' width='83'>单位{i}</td>");
+                detail.Append($"<td valign='top' width='83'>规格{i}</td>");
+                detail.Append($"<td valign='top' width='83'>价格{i}</td>");
+                detail.Append("</tr>");
+                i++;
+            }
+            detail.Append("</tbody></table>");
+            //生成PDF
+            string html = $"<!DOCTYPE html><html><head><meta charset='UTF-8'><title>pdf</title></head><body>{detail.ToString()}</body></html>";
+            string pdfPath = PDFTools.HtmlToPdf(html, $"{AppDomain.CurrentDomain.BaseDirectory}/Images/wm.jpeg");
+            return pdfPath;
+        }
 
         /// <summary>
         /// 生成上一页或下一页的 URI（P35）

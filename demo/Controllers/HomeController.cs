@@ -1,18 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using demo.Models;
-using Magicodes.ExporterAndImporter.Attributes;
-using Microsoft.Extensions.DependencyInjection;
-using MyDemo.Models.Dto;
-using MyDemo.Services;
+using MyDemo.Helpers;
+using MyDemo.Models;
 using StackExchange.Redis;
 
-namespace demo.Controllers
+namespace MyDemo.Controllers
 {
     public class HomeController : Controller
     {
@@ -34,6 +29,7 @@ namespace demo.Controllers
             _db.StringSet("fullName", "JacobCai");
             var name = _db.StringGet("fullName");
 
+
             return View("Index", name);
         }
 
@@ -45,7 +41,7 @@ namespace demo.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
     }

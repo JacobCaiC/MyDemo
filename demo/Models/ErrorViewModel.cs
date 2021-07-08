@@ -1,6 +1,4 @@
-using System;
-
-namespace demo.Models
+namespace MyDemo.Models
 {
     public class ErrorViewModel
     {

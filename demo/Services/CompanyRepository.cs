@@ -1,11 +1,11 @@
-﻿using demo.Data;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using MyDemo.Entities;
 using MyDemo.Models.DtoParamaters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MyDemo.Data;
 using MyDemo.Helpers;
 using MyDemo.Models.Dto;
 

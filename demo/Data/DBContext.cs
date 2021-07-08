@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 using MyDemo.Entities;
-using System;
 
-namespace demo.Data
+namespace MyDemo.Data
 {
     public class DBContext : DbContext
     {

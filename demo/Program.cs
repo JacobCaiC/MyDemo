@@ -1,13 +1,13 @@
-using demo.Data;
+using System;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using MyDemo.Data;
 using MyDemo.Models;
-using System;
 
-namespace demo
+namespace MyDemo
 {
     /// <summary>
     /// ³ÌÐòÈë¿Ú

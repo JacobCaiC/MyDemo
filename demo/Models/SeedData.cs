@@ -1,9 +1,9 @@
-﻿using demo.Data;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MyDemo.Entities;
 using System;
 using System.Linq;
+using MyDemo.Data;
 
 namespace MyDemo.Models
 {

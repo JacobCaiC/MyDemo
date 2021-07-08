@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using GraphQL;
+using GraphQL.Types;
+
 
 namespace ConsoleApp
 {
@@ -9,8 +12,9 @@ namespace ConsoleApp
     /// </summary>
     class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
+            
             Console.WriteLine(ThreadID() + " =》主线程启动");
             MethodAsync(); //调用异步方法
             Console.WriteLine(ThreadID() + " =》主线程继续执行");
@@ -41,5 +45,7 @@ namespace ConsoleApp
         {
             return Thread.CurrentThread.ManagedThreadId.ToString();
         }
+
+
     }
 }

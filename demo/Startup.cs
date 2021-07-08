@@ -1,5 +1,9 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using AutoMapper;
-using demo.Data;
+using Magicodes.ExporterAndImporter.Filters;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -8,19 +12,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MyDemo.Services;
-using Newtonsoft.Json.Serialization;
-using System;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using Magicodes.ExporterAndImporter.Builder;
-using Magicodes.ExporterAndImporter.Filters;
 using Microsoft.OpenApi.Models;
+using MyDemo.Data;
 using MyDemo.Models;
 using MyDemo.Models.Elasticsearch;
+using MyDemo.Services;
+using Newtonsoft.Json.Serialization;
 
-namespace demo
+namespace MyDemo
 {
     public class Startup
     {
@@ -193,6 +192,7 @@ namespace demo
         /// <param name="env"></param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+
             //swagger
             app.UseSwagger();
             app.UseSwaggerUI(c =>
