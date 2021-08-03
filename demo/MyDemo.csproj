@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
+    <PackageReference Include="DotNetCommon" Version="1.1.0" />
     <PackageReference Include="GraphQL" Version="4.5.0" />
     <PackageReference Include="iTextSharp" Version="5.5.13.2" />
     <PackageReference Include="Magicodes.IE.AspNetCore" Version="2.5.3.8" />
